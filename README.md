@@ -1,55 +1,57 @@
-# Plataforma IoT para Prevención de Incendios
+# Plataforma IoT con Seguridad Integrada
 
 **V1.0.1** | Instalador Automatizado para Debian 13
 
-Sistema completo de monitoreo IoT con autenticación criptográfica de dispositivos, gestión de usuarios multi-nivel y almacenamiento distribuido de datos de sensores.
+Sistema completo de monitoreo IoT con autenticación criptográfica de dispositivos, gestión de usuarios multinivel y almacenamiento distribuido de datos de sensores.
 
 ---
 
 ## Descripción General
 
-Esta plataforma permite la implementación de redes de sensores IoT orientadas a la prevención y detección temprana de incendios. El sistema está diseñado para escenarios de alto riesgo como zonas forestales, instalaciones industriales y áreas urbanas densas.
+Esta plataforma permite desplegar un ecosistema IoT centralizado con mecanismos de seguridad integrados desde la instalación, siguiendo un enfoque security-first for IoT ecosystems. El instalador automatizado reduce las barreras técnicas de adopción al configurar todas las capas de seguridad, bases de datos y servicios de aplicación sin intervención manual, completando el despliegue en 10 a 15 minutos sobre un servidor Debian 13 limpio.
 
-El instalador automatizado despliega la infraestructura completa en 10-15 minutos sobre un servidor Debian 13 limpio, configurando todas las capas de seguridad, bases de datos y servicios de aplicación sin intervención manual.
+La arquitectura es agnóstica respecto al escenario de aplicación, lo que permite adaptarla a distintas necesidades operativas sin modificar el núcleo del sistema.
 
-**Casos de uso principales:**
+**Nota:** Esta plataforma expone exclusivamente una API REST como backend. Para una experiencia de usuario completa se requiere integrar un frontend (aplicación web, móvil o dashboard) que consuma los endpoints documentados en la sección [Uso de la API](#uso-de-la-api).
 
-- Monitoreo continuo de temperatura y niveles de humo en áreas extensas
-- Gestión centralizada de múltiples dispositivos sensores distribuidos geográficamente
-- Histórico de lecturas para análisis de patrones y predicción de riesgos
-- Sistema de alertas basado en umbrales configurables
-- Acceso diferenciado por roles para operadores, supervisores y administradores
+**Casos de uso habilitados por la plataforma:**
+
+- Monitoreo continuo de sensores distribuidos geográficamente con recolección centralizada de telemetría
+- Gestión de flotas de dispositivos IoT organizados por zonas, servicios o agrupaciones lógicas definidas por el usuario
+- Almacenamiento histórico de lecturas para análisis de patrones, tendencias y detección de anomalías
+- Sistema de alertas basado en umbrales configurables por tipo de sensor
+- Control de acceso diferenciado por roles para operadores, supervisores y administradores
 
 ---
 
 ## Características Técnicas
 
-### Autenticación Multi-Nivel
+### Autenticación Multinivel
 
 El sistema implementa cuatro mecanismos de autenticación independientes, cada uno diseñado para un tipo específico de entidad:
 
-**Usuarios Finales**  
-Acceso de solo lectura para consulta de reportes y visualización de datos históricos. Ideal para personal de monitoreo básico.
+**Usuarios finales**
+Acceso de solo lectura para consulta de reportes y visualización de datos históricos. Orientado a personal de monitoreo básico.
 
-**Gerentes Operativos**  
+**Gerentes operativos**
 Permisos para crear servicios, asignar dispositivos a zonas específicas y gestionar usuarios de nivel inferior. Diseñado para coordinadores de área.
 
-**Administradores**  
-Control total del sistema incluyendo gestión de roles, permisos, dispositivos y configuración de infraestructura.
+**Administradores**
+Control total del sistema, incluyendo gestión de roles, permisos, dispositivos y configuración de infraestructura.
 
-**Dispositivos IoT**  
-Autenticación mediante reto criptográfico basado en AES-256-CBC y HMAC-SHA256. El dispositivo demuestra posesión de la clave secreta sin transmitirla, previniendo ataques de replay y man-in-the-middle.
+**Dispositivos IoT**
+Autenticación mediante reto criptográfico basado en AES-256-CBC y HMAC-SHA256. El dispositivo demuestra posesión de la clave secreta sin transmitirla, lo que previene ataques de replay y man-in-the-middle.
 
 ### Política de Sesión Única
 
-Cada entidad solo puede mantener una sesión activa simultáneamente. Si se detecta un intento de inicio de sesión mientras existe una sesión vigente, el sistema rechaza la solicitud con código HTTP 409 Conflict. Esto previene compartir credenciales y mejora la trazabilidad de acciones.
+Cada entidad solo puede mantener una sesión activa de forma simultánea. Si se detecta un intento de inicio de sesión mientras existe una sesión vigente, el sistema rechaza la solicitud con código HTTP 409 Conflict. Esto previene el uso compartido de credenciales y mejora la trazabilidad de acciones.
 
 ### Arquitectura de Datos Distribuida
 
 | Base de Datos | Propósito | Modelo |
 |---------------|-----------|--------|
 | MySQL 8.0 | Entidades del sistema (usuarios, roles, dispositivos, servicios) | Relacional normalizado |
-| MongoDB 7.0 | Lecturas de sensores, logs de dispositivos, alertas de incendio | Documental con índices optimizados |
+| MongoDB 7.0 | Lecturas de sensores, logs de dispositivos, alertas | Documental con índices optimizados |
 | Redis 7 | Sesiones activas, caché de autenticación | Clave-valor en memoria |
 
 Esta separación permite escalar cada componente de forma independiente según las necesidades de carga y retención de datos.
@@ -58,13 +60,13 @@ Esta separación permite escalar cada componente de forma independiente según l
 
 El sistema implementa defensa en profundidad mediante cinco capas consecutivas:
 
-1. **nftables** - Firewall de red con conjuntos dinámicos de IPs bloqueadas y limitación de conexiones por segundo
-2. **Fail2Ban** - Detección de patrones de ataque en logs y bloqueo automático de IPs maliciosas (5 jails activos)
-3. **Nginx** - Proxy inverso con rate limiting por endpoint, headers de seguridad y filtrado de solicitudes sospechosas
-4. **FastAPI** - Validación de tokens JWT, verificación de permisos por rol y sanitización de entradas
-5. **Aislamiento de red** - Las bases de datos solo son accesibles desde la red interna de Docker (172.20.0.0/16)
+1. **nftables**: firewall de red con conjuntos dinámicos de IPs bloqueadas y limitación de conexiones por segundo.
+2. **Fail2Ban**: detección de patrones de ataque en logs y bloqueo automático de IPs maliciosas (5 jails activos).
+3. **Nginx**: proxy inverso con rate limiting por endpoint, headers de seguridad y filtrado de solicitudes sospechosas.
+4. **FastAPI**: validación de tokens JWT, verificación de permisos por rol y sanitización de entradas.
+5. **Aislamiento de red**: las bases de datos solo son accesibles desde la red interna de Docker (172.20.0.0/16).
 
-Ninguna base de datos acepta conexiones desde el host o internet, eliminando vectores de ataque directo.
+Ninguna base de datos acepta conexiones desde el host o internet, lo que elimina vectores de ataque directo.
 
 ---
 
@@ -84,12 +86,11 @@ Ninguna base de datos acepta conexiones desde el host o internet, eliminando vec
   sudo apt install -y git curl openssl bc
   ```
 
-
 ### Recomendaciones
 
 - Servidor dedicado o VPS con IP pública estática
-- Acceso a consola del proveedor (respaldo en caso de problemas con SSH)
-- Snapshot o backup del servidor antes de iniciar
+- Acceso a consola del proveedor como respaldo en caso de problemas con SSH
+- Snapshot o backup del servidor antes de iniciar la instalación
 
 ---
 
@@ -111,7 +112,8 @@ Clonar el repositorio del instalador:
 git clone https://github.com/agustinra24/auto-iotserver
 cd auto-iotserver
 ```
-Nota: El instalador verifica automáticamente estas dependencias al iniciar.
+
+**Nota:** El instalador verifica automáticamente estas dependencias al iniciar.
 
 ### Asignar Permisos de Ejecución
 
@@ -139,11 +141,11 @@ sudo ./install.sh
 
 El instalador solicitará los siguientes parámetros de configuración:
 
-- **Dirección IP del servidor** - Se detecta automáticamente, confirmar o modificar
-- **Nombre de usuario del sistema** - Reemplaza al usuario por defecto de Debian
-- **Puerto SSH personalizado** - Se recomienda usar un puerto no estándar (ej: 5259)
-- **Nombre de dominio** - Opcional, para configuración futura de SSL/TLS
-- **Credenciales del administrador principal** - Email y contraseña para la cuenta maestra de la plataforma
+- **Dirección IP del servidor**: se detecta automáticamente; confirmar o modificar.
+- **Nombre de usuario del sistema**: reemplaza al usuario por defecto de Debian.
+- **Puerto SSH personalizado**: se recomienda un puerto no estándar (ej: 5259).
+- **Nombre de dominio**: opcional, para configuración futura de SSL/TLS.
+- **Credenciales del administrador principal**: email y contraseña para la cuenta maestra de la plataforma.
 
 Todos los valores entre corchetes son sugerencias del sistema. Presionar Enter acepta el valor por defecto.
 
@@ -159,18 +161,18 @@ El instalador ejecuta 14 fases secuenciales:
 6. Hardening de SSH (cambio de puerto, deshabilitación de root)
 7. Instalación de Docker CE y Docker Compose
 8. Creación de estructura de directorios del proyecto
-9. Despliegue de aplicación FastAPI
-10. Inicialización de esquema de base de datos MySQL
+9. Despliegue de la aplicación FastAPI
+10. Inicialización del esquema de base de datos MySQL
 11. Configuración de Nginx como proxy inverso
 12. Orquestación de contenedores con Docker Compose
 13. Pruebas de integración y validación de endpoints
 14. Limpieza de archivos temporales y verificación final
 
-Cada fase incluye checkpoints. Si la instalación se interrumpe, es posible reanudar desde el último punto exitoso usando `--resume`.
+Cada fase incluye checkpoints. Si la instalación se interrumpe, es posible reanudarla desde el último punto exitoso con `--resume`.
 
 ### Tiempo de Instalación
 
-Entre 10 y 15 minutos dependiendo de la velocidad del servidor y la latencia de red.
+Entre 10 y 15 minutos, dependiendo de la velocidad del servidor y la latencia de red.
 
 ---
 
@@ -218,6 +220,7 @@ curl http://<IP_SERVIDOR>/health
 ```
 
 Respuesta esperada:
+
 ```json
 {"status": "healthy"}
 ```
@@ -236,6 +239,7 @@ curl -X POST http://<IP_SERVIDOR>/api/v1/auth/login/admin \
 ```
 
 Respuesta:
+
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -247,7 +251,7 @@ Respuesta:
 
 ### Uso del Token
 
-Incluir el token en el header Authorization de solicitudes subsecuentes:
+Incluir el token en el header `Authorization` de las solicitudes subsecuentes:
 
 ```bash
 curl http://<IP_SERVIDOR>/api/v1/users \
@@ -277,19 +281,19 @@ http://<IP_SERVIDOR>/docs
 
 Los sensores IoT utilizan un protocolo de autenticación basado en retos criptográficos que previene ataques de replay y protege las claves secretas.
 
-### Fundamento Matemático
+### Fundamento Criptográfico
 
 Cada dispositivo posee una clave de cifrado `K_device` de 32 bytes almacenada de forma segura. El servidor mantiene una clave complementaria `K_server` derivada de la clave maestra JWT.
 
 **Proceso de autenticación:**
 
-1. Dispositivo genera número aleatorio `R2` (32 bytes)
-2. Calcula parámetro de identidad: `P2 = HMAC-SHA256(K_device || K_server, R2)`
-3. Cifra el parámetro: `P2c = AES-256-CBC(P2, K_device, IV_aleatorio)`
-4. Envía al servidor: `{id_origen, R2, P2c}`
-5. Servidor reconstruye `P2` usando su copia de `K_device`
-6. Descifra `P2c` y compara con su cálculo
-7. Si coincide, emite JWT con validez de 24 horas
+1. El dispositivo genera un número aleatorio `R2` (32 bytes).
+2. Calcula el parámetro de identidad: `P2 = HMAC-SHA256(K_device || K_server, R2)`.
+3. Cifra el parámetro: `P2c = AES-256-CBC(P2, K_device, IV_aleatorio)`.
+4. Envía al servidor: `{id_origen, R2, P2c}`.
+5. El servidor reconstruye `P2` usando su copia de `K_device`.
+6. Descifra `P2c` y compara el resultado con su propio cálculo.
+7. Si coinciden, emite un JWT con validez de 24 horas.
 
 El dispositivo demuestra posesión de `K_device` sin transmitirla en ningún momento.
 
@@ -298,11 +302,13 @@ El dispositivo demuestra posesión de `K_device` sin transmitirla en ningún mom
 Para facilitar el desarrollo, la API incluye endpoints auxiliares que simulan el comportamiento del dispositivo:
 
 **Inicializar clave del dispositivo:**
+
 ```bash
 curl -X POST "http://<IP>/api/v1/auth/device/init-encryption-key?device_id=1"
 ```
 
 **Generar reto criptográfico de prueba:**
+
 ```bash
 curl -X POST "http://<IP>/api/v1/auth/device/generate-puzzle-test?device_id=1"
 ```
@@ -340,10 +346,11 @@ curl "http://<IP>/api/v1/devices/1/readings?sensor_type=temperature&limit=100" \
 ```
 
 Parámetros de consulta disponibles:
-- `sensor_type`: Filtrar por tipo (temperature, smoke_level, battery)
-- `start_date`: Fecha de inicio (ISO 8601)
-- `end_date`: Fecha de fin (ISO 8601)
-- `limit`: Máximo de registros (default: 100, max: 1000)
+
+- `sensor_type`: filtrar por tipo (temperature, smoke_level, battery).
+- `start_date`: fecha de inicio (ISO 8601).
+- `end_date`: fecha de fin (ISO 8601).
+- `limit`: máximo de registros (default: 100, max: 1000).
 
 ---
 
@@ -354,27 +361,32 @@ Parámetros de consulta disponibles:
 El sistema implementa RBAC (Role-Based Access Control) con 14 tablas:
 
 **Entidades principales:**
-- `usuario`, `gerente`, `admin` - Cuentas del sistema
-- `dispositivo` - Sensores IoT registrados
-- `servicio` - Agrupaciones lógicas de dispositivos
-- `app` - Aplicaciones cliente que consumen la API
+
+- `usuario`, `gerente`, `admin`: cuentas del sistema.
+- `dispositivo`: sensores IoT registrados.
+- `servicio`: agrupaciones lógicas de dispositivos.
+- `app`: aplicaciones cliente que consumen la API.
 
 **Control de acceso:**
-- `rol` - Perfiles de permisos (admin_master, admin_normal, manager, user)
-- `permiso` - Acciones granulares (create_user, edit_device, view_reports, etc.)
-- `rol_permiso` - Tabla de unión muchos-a-muchos
+
+- `rol`: perfiles de permisos (admin_master, admin_normal, manager, user).
+- `permiso`: acciones granulares (create_user, edit_device, view_reports, etc.).
+- `rol_permiso`: tabla de unión muchos a muchos.
 
 **Seguridad:**
-- `pasusuario`, `pasgerente`, `pasadmin`, `pasdispositivo` - Almacenamiento aislado de credenciales
+
+- `pasusuario`, `pasgerente`, `pasadmin`, `pasdispositivo`: almacenamiento aislado de credenciales.
 
 Las contraseñas se hashean con Argon2id usando parámetros resistentes a ataques GPU:
+
 - 100 MB de memoria
 - 2 iteraciones
 - 8 hilos paralelos
 
 ### Colecciones de MongoDB
 
-**sensor_readings** - Lecturas normalizadas de sensores
+**sensor_readings**: lecturas normalizadas de sensores.
+
 ```javascript
 {
   device_id: "1",
@@ -386,9 +398,9 @@ Las contraseñas se hashean con Argon2id usando parámetros resistentes a ataque
 }
 ```
 
-**device_logs** - Eventos de dispositivos (conexión, desconexión, errores)
+**device_logs**: eventos de dispositivos (conexión, desconexión, errores).
 
-**alerts** - Alertas de incendio generadas por umbrales
+**alerts**: alertas generadas al superar umbrales configurados.
 
 Índices optimizados para consultas por dispositivo, tipo de sensor y rango temporal.
 
@@ -406,6 +418,7 @@ sudo docker compose ps
 ```
 
 Salida esperada (5 contenedores):
+
 ```
 NAME            STATUS          PORTS
 iot-mysql       Up (healthy)    
@@ -436,6 +449,7 @@ sudo fail2ban-client status
 ```
 
 Salida esperada:
+
 ```
 |- Number of jail:      5
 `- Jail list:   nginx-badbots, nginx-botsearch, nginx-http-auth, 
@@ -444,7 +458,7 @@ Salida esperada:
 
 ### Prueba de Autenticación
 
-Verificar los cuatro tipos de login:
+Verificar los tres tipos de login de usuarios:
 
 ```bash
 # Usuario
@@ -470,25 +484,29 @@ curl -X POST http://localhost/api/v1/auth/login/admin \
 ### Críticas
 
 1. **Respaldar archivo de secretos**
+
    ```bash
    cat ~/.iot-platform/.secrets
    ```
+
    Este archivo contiene todas las contraseñas generadas automáticamente. Sin él, no es posible recuperar acceso a las bases de datos.
 
 2. **Cambiar contraseña del usuario del sistema**
+
    ```bash
    passwd
    ```
 
 3. **Eliminar usuarios de prueba**
-   Los usuarios `user@fire.com` y `gerente@fire.com` tienen contraseñas por defecto. Eliminarlos en entornos de producción.
+
+   Los usuarios `user@fire.com` y `gerente@fire.com` tienen contraseñas por defecto. Deben eliminarse en entornos de producción.
 
 ### Recomendadas
 
 - Configurar certificados SSL/TLS con Let's Encrypt para habilitar HTTPS
 - Establecer backups automáticos de MySQL y MongoDB
 - Configurar monitoreo de métricas (Prometheus + Grafana)
-- Ajustar parámetros de rate limiting según carga esperada
+- Ajustar parámetros de rate limiting según la carga esperada
 
 ---
 
@@ -527,7 +545,7 @@ cd ~/iot-platform
 sudo docker compose logs <nombre_contenedor> --tail=50
 ```
 
-Reiniciar contenedor específico:
+Reiniciar un contenedor específico:
 
 ```bash
 sudo docker compose restart <nombre_contenedor>
@@ -541,7 +559,7 @@ Verificar errores de configuración:
 sudo fail2ban-server -f --loglevel DEBUG 2>&1 | head -50
 ```
 
-Error común: archivos de log de Nginx no existen aún. Solución:
+Error común: los archivos de log de Nginx aún no existen. Solución:
 
 ```bash
 cd ~/iot-platform/logs/nginx
@@ -551,15 +569,17 @@ sudo systemctl restart fail2ban
 
 ### Error de Autenticación de Dispositivo
 
-Si la verificación del puzzle falla:
+Si la verificación del reto criptográfico falla:
 
 1. Verificar que la clave del dispositivo existe:
+
    ```bash
    sudo docker exec iot-mysql mysql -u root -p<password> -e \
      "SELECT id, LENGTH(encryption_key) FROM fire_preventionf.pasdispositivo WHERE id=1;"
    ```
 
-2. Reinicializar clave si es necesario:
+2. Reinicializar la clave si es necesario:
+
    ```bash
    curl -X POST "http://localhost/api/v1/auth/device/init-encryption-key?device_id=1"
    ```
@@ -612,7 +632,7 @@ Para proponer cambios:
 4. Push a la rama
 5. Abrir Pull Request con descripción detallada
 
-Revisar primero la arquitectura existente y asegurar compatibilidad con el esquema de autenticación actual.
+Revisar primero la arquitectura existente y verificar la compatibilidad con el esquema de autenticación actual.
 
 ---
 
@@ -651,4 +671,4 @@ sudo docker logs iot-mongodb --tail=100
 ---
 
 **V1.0.1** | Diciembre 2025
-Sistema de Prevención de Incendios basado en IoT
+Plataforma IoT con Seguridad Integrada
