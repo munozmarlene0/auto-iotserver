@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="API de Plataforma IoT",
     description="Plataforma IoT con autenticación criptográfica de dispositivos",
-    version="1.0.1",
+    version="1.1",
     lifespan=lifespan
 )
 
@@ -108,7 +108,7 @@ app.openapi = custom_openapi
 
 @app.get("/")
 def root():
-    return {"message": "API de Plataforma IoT v1.0.1", "status": "operacional"}
+    return {"message": "API de Plataforma IoT v1.1", "status": "operacional"}
 
 
 @app.get("/health")

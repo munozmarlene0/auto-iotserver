@@ -1,6 +1,6 @@
 #!/bin/bash
 ################################################################################
-# Plataforma IoT con Seguridad Integrada - Instalador Automatizado v1.0.1
+# Plataforma IoT con Seguridad Integrada - Instalador Automatizado v1.1
 #
 # Requisitos: Debian 13 (Trixie) limpio, acceso root/sudo
 # Ejecución: sudo ./install.sh [--dry-run] [--resume]
@@ -115,7 +115,7 @@ parse_arguments() {
 ################################################################################
 show_help() {
     cat << EOF
-Plataforma IoT con Seguridad Integrada - Instalador Automatizado v1.0.1
+Plataforma IoT con Seguridad Integrada - Instalador Automatizado v${PLATFORM_VERSION}
 
 USO:
     sudo ./install.sh [OPCIONES]
@@ -147,7 +147,7 @@ show_welcome() {
     
     echo -e "
 ${BLUE}═══════════════════════════════════════════════════════════════════${RESET}
-${BOLD}              SISTEMA DE INSTALACIÓN AUTOMATIZADO v1.0.1                   ${RESET}
+${BOLD}              SISTEMA DE INSTALACIÓN AUTOMATIZADO v${PLATFORM_VERSION}                   ${RESET}
 ${BLUE}═══════════════════════════════════════════════════════════════════${RESET}
 
 ${YELLOW}ADVERTENCIA - LEE CUIDADOSAMENTE${RESET}

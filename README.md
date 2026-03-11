@@ -1,6 +1,6 @@
 # Plataforma IoT con Seguridad Integrada
 
-**V1.0.1** | Instalador Automatizado para Debian 13
+**V1.1** | Instalador Automatizado para Debian 13
 
 Sistema completo de monitoreo IoT con autenticación criptográfica de dispositivos, gestión de usuarios multinivel y almacenamiento distribuido de datos de sensores.
 
@@ -670,5 +670,5 @@ sudo docker logs iot-mongodb --tail=100
 
 ---
 
-**V1.0.1** | Diciembre 2025
+**V1.1** | Marzo 2026
 Plataforma IoT con Seguridad Integrada
