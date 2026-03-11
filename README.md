@@ -207,6 +207,10 @@ iot-platform/
     └── nginx/
 ```
 
+## Diagrama de Base de Datos
+
+![Diagrama ER de la Plataforma IoT](docs/db-diagram.png)
+
 ---
 
 ## Uso de la API
