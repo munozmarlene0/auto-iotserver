@@ -2,6 +2,8 @@
 Plataforma IoT - Aplicación Principal
 FastAPI con MongoDB para datos de sensores
 """
+
+
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from contextlib import asynccontextmanager
@@ -12,6 +14,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+#prueba para brenda
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
