@@ -2,6 +2,9 @@
 Plataforma IoT - Aplicación Principal
 FastAPI con MongoDB para datos de sensores
 """
+
+#Brenda
+
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from contextlib import asynccontextmanager
